@@ -392,16 +392,21 @@ def generate_html_report(data):
     return html_template
 
 def write_to_file(filepath, data, format='json'):
+    if filepath == '-':
+        f = sys.stdout
+    else:
+        f = open(filepath, 'w+', encoding='utf-8' if format == 'html' else None)
+    
     if format == 'json':
-        with open(filepath, 'w+') as f:
-            json.dump(data, f)
+        json.dump(data, f, ensure_ascii=False)
     elif format == 'csv':
         url = list(data.keys())[0]
-        with open(filepath, 'w+') as f:
-            for tech, tech_data in data[url].items():
-                csv_data = url + ',' + tech + ',' + tech_data['version'] + ',' + str(tech_data['confidence']) + ',' + ' '.join(tech_data['categories']) + ',' + ' '.join(tech_data['groups']) + '\n'
-                f.write(csv_data)
+        for tech, tech_data in data[url].items():
+            csv_data = url + ',' + tech + ',' + tech_data['version'] + ',' + str(tech_data['confidence']) + ',' + ' '.join(tech_data['categories']) + ',' + ' '.join(tech_data['groups']) + '\n'
+            f.write(csv_data)
     elif format == 'html':
         html_content = generate_html_report(data)
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(html_content)
+        f.write(html_content)
+    
+    if filepath != '-':
+        f.close()
