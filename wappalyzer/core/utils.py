@@ -1,4 +1,5 @@
 import json
+import sys
 from huepy import bold, green
 from wappalyzer.core.config import cat_db, groups_db, tech_db
 
